@@ -6,10 +6,9 @@ const prisma = require('../config/database');
  * @param {Object} data - Post data containing title, content, and optional imageUrl.
  * @returns {Object} The created post object with author details.
  */
-const createPost = async (authorId, {title, content, imageUrl}) => {
+const createPost = async (authorId, {content, imageUrl}) => {
     const post = await prisma.post.create({
         data: {
-            title,
             content,
             imageUrl:imageUrl || null,
             authorId,
@@ -89,7 +88,7 @@ const getPostById = async (postId) => {
  * @returns {Object} The updated post object.
  * @throws {Error} If post not found (status 404) or user is not the author (status 403).
  */
-const updatePost = async (postId, authorId, {title, 
+const updatePost = async (postId, authorId, { 
     content, imageUrl}) => {
     const existingPost = await getPostById(postId);
     
@@ -102,7 +101,6 @@ const updatePost = async (postId, authorId, {title,
     const updatePost = await prisma.post.update({
         where: {id: postId},
         data: {
-            title,
             content,
             imageUrl:imageUrl || null,
         },

@@ -11,15 +11,15 @@ const postService = require('../services/postService');
 const createPost = async (req, res, next) => {
     try {
         const authorId = req.user.id;
-        const { title, content, imageUrl } = req.body;
+        const { content, imageUrl } = req.body;
 
-        if( !title || !content) {
-            const error = new Error('Title and content are required!');
+        if( !content) {
+            const error = new Error('Content is required!');
             error.status = 400;
             throw error;
         }
 
-        const newPost = await postService.createPost(req.user.id, {title, content, imageUrl});
+        const newPost = await postService.createPost(req.user.id, {content, imageUrl});
 
         res.status(201).json(newPost);
     } catch (error) {
