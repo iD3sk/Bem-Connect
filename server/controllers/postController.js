@@ -63,6 +63,23 @@ const getPostById = async (req, res, next) => {
 }
 
 /**
+ * @desc    Get all posts by a specific user
+ * @route   GET /api/posts/user/:userId
+ * @access  Public
+ * @param {Object} req - Request object
+ * @param {Object} res - Response object
+ * @param {Function} next - Next middleware function
+ */
+const getPostsByUserId = async (req, res, next) => {
+    try {
+        const posts = await postService.getPostsByUserId(req.params.userId);
+        res.status(200).json(posts);
+    } catch (error) {
+        next(error);
+    }
+}
+
+/**
  * @desc    Update a post
  * @route   PUT /api/posts/:id
  * @access  Private
