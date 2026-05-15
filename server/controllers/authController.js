@@ -6,32 +6,38 @@ const authService = require('../services/authService');
  * @access  Public
  */
 const signup = async (req, res, next) => {
-  try {
-    const { email, password, name } = req.body;
+    try {
+        const { email, username, password, name, birthday } = req.body;
 
-    // Basic input validation
-    if (!email || !password || !name) {
-      return res.status(400).json({
-        error: 'Please provide email, password, and name',
-      });
+        // Basic input validation
+        if (!email || !username || !password || !name || !birthday) {
+            return res.status(400).json({
+                error: 'Please provide all the required data!',
+            });
+        }
+
+        if (password.length < 8) {
+            return res.status(400).json({
+                error: 'Password must be at least 8 characters long',
+            });
+        }
+
+        const result = await authService.signup({
+            email,
+            username,
+            password,
+            name,
+            birthday,
+        });
+
+        res.status(201).json({
+            message: 'Account created successfully',
+            user: result.user,
+            token: result.token,
+        });
+    } catch (error) {
+        next(error);
     }
-
-    if (password.length < 8) {
-      return res.status(400).json({
-        error: 'Password must be at least 8 characters long',
-      });
-    }
-
-    const result = await authService.signup({ email, password, name });
-
-    res.status(201).json({
-      message: 'Account created successfully',
-      user: result.user,
-      token: result.token,
-    });
-  } catch (error) {
-    next(error);
-  }
 };
 
 /**
@@ -40,25 +46,25 @@ const signup = async (req, res, next) => {
  * @access  Public
  */
 const login = async (req, res, next) => {
-  try {
-    const { email, password } = req.body;
+    try {
+        const { email, password } = req.body;
 
-    if (!email || !password) {
-      return res.status(400).json({
-        error: 'Please provide email and password',
-      });
+        if (!email || !password) {
+            return res.status(400).json({
+                error: 'Please provide email and password',
+            });
+        }
+
+        const result = await authService.login({ email, password });
+
+        res.status(200).json({
+            message: 'Login successful',
+            user: result.user,
+            token: result.token,
+        });
+    } catch (error) {
+        next(error);
     }
-
-    const result = await authService.login({ email, password });
-
-    res.status(200).json({
-      message: 'Login successful',
-      user: result.user,
-      token: result.token,
-    });
-  } catch (error) {
-    next(error);
-  }
 };
 
 /**
@@ -67,13 +73,13 @@ const login = async (req, res, next) => {
  * @access  Private (requires JWT)
  */
 const getMe = async (req, res, next) => {
-  try {
-    const user = await authService.getProfile(req.user.id);
+    try {
+        const user = await authService.getProfile(req.user.id);
 
-    res.status(200).json({ user });
-  } catch (error) {
-    next(error);
-  }
+        res.status(200).json({ user });
+    } catch (error) {
+        next(error);
+    }
 };
 
 module.exports = { signup, login, getMe };

@@ -10,11 +10,11 @@ const SALT_ROUNDS = 12;
  * @returns {string} Signed JWT token.
  */
 const generateToken = (user) => {
-  return jwt.sign(
-    { id: user.id, email: user.email, role: user.role },
-    process.env.JWT_SECRET,
-    { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
-  );
+    return jwt.sign(
+        { id: user.id, email: user.email, role: user.role },
+        process.env.JWT_SECRET,
+        { expiresIn: process.env.JWT_EXPIRES_IN || '7d' },
+    );
 };
 
 /**
@@ -23,8 +23,8 @@ const generateToken = (user) => {
  * @returns {Object} Sanitized user object (no password).
  */
 const sanitizeUser = (user) => {
-  const { password, ...safeUser } = user;
-  return safeUser;
+    const { password, ...safeUser } = user;
+    return safeUser;
 };
 
 /**
@@ -33,30 +33,37 @@ const sanitizeUser = (user) => {
  * @returns {Object} { user, token }
  * @throws {Error} If email already exists or validation fails.
  */
-const signup = async ({ email, password, name }) => {
-  // Check for existing user
-  const existingUser = await prisma.user.findUnique({ where: { email } });
-  if (existingUser) {
-    const error = new Error('Email is already registered');
-    error.status = 409;
-    throw error;
-  }
+const signup = async ({ name, email, username, password, birthday }) => {
+    // Cek apakah email atau username sudah terdaftar
+    const existingUser = await prisma.user.findFirst({
+        where: {
+            OR: [{ email }, { username }],
+        },
+    });
 
-  // Hash password
-  const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
+    if (existingUser) {
+        const error = new Error('Email or username already in use');
+        error.status = 400;
+        throw error;
+    }
 
-  // Create user
-  const user = await prisma.user.create({
-    data: {
-      email,
-      password: hashedPassword,
-      name,
-    },
-  });
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
 
-  const token = generateToken(user);
+    // Buat user baru
+    const user = await prisma.user.create({
+        data: {
+            name,
+            email,
+            username,
+            birthday: new Date(birthday),
+            password: hashedPassword,
+        },
+    });
 
-  return { user: sanitizeUser(user), token };
+    const token = generateToken(user);
+
+    return { user: sanitizeUser(user), token };
 };
 
 /**
@@ -66,25 +73,25 @@ const signup = async ({ email, password, name }) => {
  * @throws {Error} If credentials are invalid.
  */
 const login = async ({ email, password }) => {
-  // Find user by email
-  const user = await prisma.user.findUnique({ where: { email } });
-  if (!user) {
-    const error = new Error('Invalid email or password');
-    error.status = 401;
-    throw error;
-  }
+    // Find user by email
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (!user) {
+        const error = new Error('Invalid email or password');
+        error.status = 401;
+        throw error;
+    }
 
-  // Verify password
-  const isPasswordValid = await bcrypt.compare(password, user.password);
-  if (!isPasswordValid) {
-    const error = new Error('Invalid email or password');
-    error.status = 401;
-    throw error;
-  }
+    // Verify password
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+        const error = new Error('Invalid email or password');
+        error.status = 401;
+        throw error;
+    }
 
-  const token = generateToken(user);
+    const token = generateToken(user);
 
-  return { user: sanitizeUser(user), token };
+    return { user: sanitizeUser(user), token };
 };
 
 /**
@@ -94,14 +101,14 @@ const login = async ({ email, password }) => {
  * @throws {Error} If user not found.
  */
 const getProfile = async (userId) => {
-  const user = await prisma.user.findUnique({ where: { id: userId } });
-  if (!user) {
-    const error = new Error('User not found');
-    error.status = 404;
-    throw error;
-  }
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+        const error = new Error('User not found');
+        error.status = 404;
+        throw error;
+    }
 
-  return sanitizeUser(user);
+    return sanitizeUser(user);
 };
 
 module.exports = { signup, login, getProfile, generateToken, sanitizeUser };
