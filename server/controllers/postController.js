@@ -100,6 +100,7 @@ module.exports = {
     createPost,
     getAllPost,
     getPostById,
+    getPostsByUserId,
     updatePost,
     deletePost,
 };

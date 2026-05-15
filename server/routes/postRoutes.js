@@ -19,5 +19,7 @@ router.put('/:id', authenticate, postController.updatePost);
 // DELETE /api/posts/:id — Delete a post
 router.delete('/:id', authenticate, postController.deletePost);
 
+// GET /api/posts/user/:userId — Get all posts by a specific user
+router.get('/user/:userId', postController.getPostsByUserId);
 
 module.exports = router;

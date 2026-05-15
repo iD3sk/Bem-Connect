@@ -81,6 +81,27 @@ const getPostById = async (postId) => {
 }
 
 /**
+ * Retrieves all posts made by a specific user.
+ * @param {string} userId - The ID of the user whose posts to retrieve.
+ * @returns {Array<Object>} Array of post objects created by the specified user.
+ */
+const getPostsByUserId = async (userId) => {
+    const posts = await prisma.post.findMany({
+        where: { authorId: userId },
+        include: {
+            author: {
+                select: { id: true, name: true, email: true, avatar: true }
+            },
+            _count: {
+                select: { likes: true, comments: true },
+            },
+        },
+        orderBy: { createdAt: "desc" },
+    });
+    return posts;
+}
+
+/**
  * Updates an existing post. Validates that the updater is the post's author.
  * @param {string} postId - The ID of the post to update.
  * @param {string} authorId - The ID of the user attempting the update.
@@ -137,10 +158,12 @@ const deletePost = async (postId, authorId) => {
     return deletedPost;
 }
 
+
 module.exports = {
     createPost,
     getAllPost,
     getPostById,
+    getPostsByUserId,
     updatePost,
     deletePost,
 }
