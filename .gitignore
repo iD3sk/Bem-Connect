@@ -43,3 +43,7 @@ next-env.d.ts
 # postman
 .postman
 postman
+
+# docs
+*.md
+*.resolved
