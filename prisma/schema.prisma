@@ -24,9 +24,10 @@ model User {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  posts    Post[]
-  comments Comment[]
-  likes    Like[]
+  posts        Post[]
+  comments     Comment[]
+  postLikes    PostLike[]
+  commentLikes CommentLike[]
 
   @@map("users")
 }
@@ -51,7 +52,7 @@ model Post {
 
   author   User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
   comments Comment[]
-  likes    Like[]
+  likes    PostLike[]
 
   @@map("posts")
 }
@@ -69,6 +70,7 @@ model Comment {
 
   author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
   post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  likes  CommentLike[]
 
   @@map("comments")
 }
@@ -77,7 +79,7 @@ model Comment {
 // Likes
 // ============================================
 
-model Like {
+model PostLike {
   id        String   @id @default(uuid())
   userId    String   @map("user_id")
   postId    String   @map("post_id")
@@ -87,5 +89,22 @@ model Like {
   post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
 
   @@unique([userId, postId])
-  @@map("likes")
+  @@map("post_likes")
+}
+
+// ============================================
+// Comment Likes
+// ============================================
+
+model CommentLike {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  commentId String   @map("comment_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comment Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, commentId])
+  @@map("comment_likes")
 }
