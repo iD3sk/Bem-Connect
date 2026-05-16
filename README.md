@@ -88,5 +88,27 @@ bem-connect/
 *   **Frontend**: Next.js (App Router), Tailwind CSS v4, Lucide React (Icons).
 *   **Backend**: Node.js, Express.js.
 *   **ORM & DB**: Prisma ORM, PostgreSQL.
-*   **Auth**: JSON Web Token (JWT).
+*   **Auth**: JSON Web Token (JWT), BcryptJS.
 *   **Design**: Glassmorphism (Glass Flow Refined System).
+
+---
+
+## 📦 Key Dependencies
+
+### Frontend
+*   `next`: ^16.2.6
+*   `react`: ^19.2.4
+*   `lucide-react`: ^1.16.0
+*   `tailwindcss`: ^4.0.0
+
+### Backend
+*   `express`: ^5.2.1
+*   `prisma`: ^7.8.0
+*   `jsonwebtoken`: ^9.0.3
+*   `bcryptjs`: ^3.0.3
+*   `cors`: ^2.8.6
+*   `morgan`: ^1.10.1
+
+### Utilities
+*   `concurrently`: ^9.1.2 (Running both servers)
+*   `dotenv`: ^17.4.2
